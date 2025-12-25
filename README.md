@@ -2,6 +2,16 @@ This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-
 
 ## Getting Started
 
+## Supabase
+
+This project writes to a `waitlist` table via the `/api/waitlist` route.
+
+- If RLS is enabled on `waitlist` (common default), inserts will fail unless you either:
+	- set `SUPABASE_SERVICE_ROLE_KEY` in `.env.local` (server-only), or
+	- create an RLS INSERT policy that allows anonymous inserts.
+
+See `.env.example` for required env vars.
+
 First, run the development server:
 
 ```bash
