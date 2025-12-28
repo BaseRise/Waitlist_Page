@@ -13,7 +13,7 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "BaseRise Waitlist",
+  title: "BaseRise",
   description: "Join the BaseRise early access waitlist.",
   icons: {
     icon: [
