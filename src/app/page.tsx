@@ -1,18 +1,106 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import Link from "next/link";
 import {
   ArrowRight, Loader2, CheckCircle2, AlertCircle,
-  Github, Linkedin, Send, Twitter, Layers, Zap, ShieldCheck
+  Github, Linkedin, Send, Twitter, Layers, Zap, ShieldCheck, AlertTriangle, X
 } from "lucide-react";
 
+// ==========================================
+// 1. WARNING BANNER COMPONENT
+// ==========================================
+function MaintenanceBanner({ isVisible, onClose, bannerRef }: { isVisible: boolean; onClose: () => void; bannerRef: React.RefObject<HTMLDivElement | null> }) {
+  if (!isVisible) return null;
+
+  return (
+    <AnimatePresence>
+      <motion.div
+        ref={bannerRef}
+        initial={{ height: 0, opacity: 0 }}
+        animate={{ height: "auto", opacity: 1 }}
+        exit={{ height: 0, opacity: 0 }}
+        className="fixed top-0 left-0 right-0 bg-yellow-500/10 border-b border-yellow-500/20 backdrop-blur-md z-[60]"
+      >
+        <div className="max-w-7xl mx-auto px-4 md:px-6 py-2 md:py-3 flex items-start md:items-center justify-between gap-2 md:gap-4">
+          <div className="flex items-start md:items-center gap-2 md:gap-3 text-yellow-500">
+            <AlertTriangle size={18} className="flex-shrink-0 animate-pulse mt-0.5 md:mt-0" />
+            <p className="text-xs md:text-sm font-medium text-yellow-200/90">
+              <span className="font-bold text-yellow-400">Technical Issue:</span> We are having some issues with our database. Waitlist and newsletter are not working  temporarily.
+            </p>
+          </div>
+          <button 
+            onClick={onClose}
+            className="text-yellow-500 hover:text-yellow-300 transition-colors flex-shrink-0"
+          >
+            <X size={16} className="md:w-[18px] md:h-[18px]" />
+          </button>
+        </div>
+      </motion.div>
+    </AnimatePresence>
+  );
+}
 export default function LandingPage() {
   // 1. States
   const [newsEmail, setNewsEmail] = useState("");
   const [submitting, setSubmitting] = useState(false);
   const [message, setMessage] = useState<{ text: string; type: 'success' | 'error' } | null>(null);
+  const [showBanner, setShowBanner] = useState(true);
+  const [bannerHeight, setBannerHeight] = useState(44);
+  const [bannerClosed, setBannerClosed] = useState(false); // Track if user manually closed
+  const bannerRef = useRef<HTMLDivElement>(null);
+
+  // Update banner height on mount and resize
+  useEffect(() => {
+    const updateBannerHeight = () => {
+      if (bannerRef.current) {
+        const height = bannerRef.current.offsetHeight;
+        if (height > 0) {
+          setBannerHeight(height);
+        }
+      }
+    };
+
+    if (showBanner && !bannerClosed) {
+      updateBannerHeight();
+      window.addEventListener('resize', updateBannerHeight);
+      
+      // Multiple attempts to ensure banner is rendered
+      const timeout1 = setTimeout(updateBannerHeight, 50);
+      const timeout2 = setTimeout(updateBannerHeight, 150);
+      const timeout3 = setTimeout(updateBannerHeight, 300);
+      
+      return () => {
+        window.removeEventListener('resize', updateBannerHeight);
+        clearTimeout(timeout1);
+        clearTimeout(timeout2);
+        clearTimeout(timeout3);
+      };
+    }
+  }, [showBanner, bannerClosed]);
+
+  // Hide banner on scroll (only if not manually closed)
+  useEffect(() => {
+    const handleScroll = () => {
+      if (bannerClosed) return; // Don't show again if user closed it
+      
+      if (window.scrollY > 50) {
+        setShowBanner(false);
+      } else {
+        setShowBanner(true);
+      }
+    };
+
+    window.addEventListener('scroll', handleScroll);
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, [bannerClosed]);
+
+  // Handle banner close
+  const handleBannerClose = () => {
+    setBannerClosed(true);
+    setShowBanner(false);
+  };
 
   // Auto-hide message after 5 seconds
   useEffect(() => {
@@ -53,6 +141,10 @@ export default function LandingPage() {
   };
 
   return (
+    <>
+      {/* WARNING BANNER */}
+      <MaintenanceBanner isVisible={showBanner && !bannerClosed} onClose={handleBannerClose} bannerRef={bannerRef} />
+      
     <div className="min-h-screen bg-[#050505] text-white overflow-hidden relative font-sans selection:bg-blue-600 selection:text-white flex flex-col justify-between">
 
       {/* ==========================================
@@ -73,19 +165,22 @@ export default function LandingPage() {
       {/* ==========================================
           NAVBAR (Clean - Teaser Mode)
       ========================================== */}
-      <nav className="fixed top-0 w-full z-50 border-b border-white/5 bg-[#050505]/80 backdrop-blur-md">
-        <div className="max-w-7xl mx-auto px-6 h-20 flex justify-between items-center relative">
+      <nav 
+        className="fixed w-full z-50 border-b border-white/5 bg-[#050505]/80 backdrop-blur-md transition-all duration-300"
+        style={{ top: (showBanner && !bannerClosed) ? `${bannerHeight}px` : '0px' }}
+      >
+        <div className="max-w-7xl mx-auto px-4 md:px-6 h-16 md:h-20 flex justify-between items-center relative">
 
           {/* Logo */}
           <div className="flex items-center gap-2 cursor-pointer">
-            <div className="w-8 h-8 bg-blue-600 rounded-lg flex items-center justify-center font-bold text-white text-lg">B</div>
-            <span className="text-xl font-semibold tracking-tight">BaseRise</span>
+            <div className="w-7 h-7 md:w-8 md:h-8 bg-blue-600 rounded-lg flex items-center justify-center font-bold text-white text-base md:text-lg">B</div>
+            <span className="text-lg md:text-xl font-semibold tracking-tight">BaseRise</span>
           </div>
 
           {/* Right Side Actions - Only Waitlist for now */}
           <div className="flex items-center gap-4">
             <Link href="/waitlist">
-              <button className="px-5 py-2.5 bg-blue-600 text-white font-semibold rounded-full text-sm hover:bg-blue-500 transition-all shadow-[0_0_15px_rgba(37,99,235,0.3)]">
+              <button className="px-4 md:px-5 py-2 md:py-2.5 bg-blue-600 text-white font-semibold rounded-full text-xs md:text-sm hover:bg-blue-500 transition-all shadow-[0_0_15px_rgba(37,99,235,0.3)]">
                 Join Waitlist
               </button>
             </Link>
@@ -233,9 +328,9 @@ export default function LandingPage() {
                     <path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z" />
                   </svg>
                 </a>
-                <a href="#" className="w-10 h-10 rounded-full bg-white/5 border border-white/10 flex items-center justify-center transition-all duration-300 group hover:bg-[#0A66C2] hover:border-[#0A66C2] hover:shadow-[0_0_20px_rgba(10,102,194,0.5)]">
+                {/* <a href="#" className="w-10 h-10 rounded-full bg-white/5 border border-white/10 flex items-center justify-center transition-all duration-300 group hover:bg-[#0A66C2] hover:border-[#0A66C2] hover:shadow-[0_0_20px_rgba(10,102,194,0.5)]">
                   <Linkedin size={18} className="text-gray-400 group-hover:text-white transition-colors duration-300" />
-                </a>
+                </a> */}
                 <a href="#" className="w-10 h-10 rounded-full bg-white/5 border border-white/10 flex items-center justify-center transition-all duration-300 group hover:bg-[#333] hover:border-white/20 hover:shadow-[0_0_20px_rgba(255,255,255,0.2)]">
                   <Github size={18} className="text-gray-400 group-hover:text-white transition-colors duration-300" />
                 </a>
@@ -316,5 +411,6 @@ export default function LandingPage() {
       </footer>
 
     </div>
+    </>
   );
 }
