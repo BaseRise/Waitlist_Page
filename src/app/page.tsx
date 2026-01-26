@@ -96,11 +96,15 @@ export default function LandingPage() {
             <span className="text-xl font-semibold tracking-tight">BaseRise</span>
           </div>
 
-          {/* Center: Leaderboard Link */}
-          <div className="absolute left-1/2 -translate-x-1/2 hidden md:block">
+          {/* Center: Leaderboard & Check Profile Links */}
+          <div className="absolute left-1/2 -translate-x-1/2 hidden md:flex items-center gap-8">
             <Link href="/leaderboard" className="text-gray-400 hover:text-blue-500 transition-colors font-medium flex items-center gap-2">
               <Layers size={18} />
               Leaderboard
+            </Link>
+            <Link href="/lookup" className="text-gray-400 hover:text-blue-500 transition-colors font-medium flex items-center gap-2">
+              <ShieldCheck size={18} />
+              Check Your Profile
             </Link>
           </div>
 
