@@ -17,13 +17,13 @@ export async function middleware(request: NextRequest) {
   if (request.nextUrl.pathname.startsWith('/api/waitlist')) {
     // 'ip' header se uthana behtar hai kyunke NextRequest.ip kabhi undefined hota hai
     const ip = request.headers.get("x-forwarded-for") ?? "127.0.0.1"
-    
+
     const { success, limit, reset, remaining } = await ratelimit.limit(ip)
 
     if (!success) {
       return NextResponse.json(
         { error: 'Too many requests. Please wait 1 minute.' },
-        { 
+        {
           status: 429,
           headers: {
             'X-RateLimit-Limit': limit.toString(),

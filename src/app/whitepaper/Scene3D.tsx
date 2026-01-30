@@ -12,11 +12,11 @@ function FloatingShape({ position, color, speed }: { position: [number, number, 
   useFrame((state) => {
     if (!meshRef.current) return;
     const t = state.clock.getElapsedTime();
-    
+
     // Rotation logic
     meshRef.current.rotation.x = Math.cos(t / 4) * speed * 0.2;
     meshRef.current.rotation.y = Math.sin(t / 4) * speed * 0.2;
-    
+
     // Mouse interaction with smoothing
     const { x, y } = state.mouse;
     meshRef.current.position.x = THREE.MathUtils.lerp(meshRef.current.position.x, position[0] + x * 2, 0.1);
@@ -43,17 +43,17 @@ function FloatingShape({ position, color, speed }: { position: [number, number, 
 export default function Scene3D() {
   return (
     <div className="h-[50vh] w-full absolute top-0 left-0 z-0 pointer-events-none">
-      <Canvas 
+      <Canvas
         shadows={false} // Shadows off for performance
         dpr={[1, 1.5]}  // Limit pixel ratio for non-GPU laptops
-        gl={{ 
-          antialias: true, 
+        gl={{
+          antialias: true,
           alpha: true,
-          powerPreference: "high-performance" 
+          powerPreference: "high-performance"
         }}
       >
         <PerspectiveCamera makeDefault position={[0, 0, 10]} />
-        
+
         {/* Basic Lights (No Environment Map) */}
         <ambientLight intensity={0.4} />
         <pointLight position={[10, 10, 10]} intensity={1.5} color="#2563eb" />
@@ -65,7 +65,7 @@ export default function Scene3D() {
           <FloatingShape position={[4, 0, -2]} color="#00c6ff" speed={0.6} />
         </group>
       </Canvas>
-      
+
       {/* Visual Overlay */}
       <div className="absolute inset-0 bg-gradient-to-b from-[#050505]/10 via-[#050505]/60 to-[#050505] z-10" />
     </div>

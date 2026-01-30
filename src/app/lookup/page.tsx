@@ -127,7 +127,7 @@ export default function LookupPage() {
     const copyToClipboard = () => {
         if (!stats?.ref_code) return;
         const link = `${window.location.origin}/waitlist?ref=${stats.ref_code}`;
-        
+
         // Try modern clipboard API first (secure contexts)
         if (navigator.clipboard && window.isSecureContext) {
             navigator.clipboard.writeText(link).then(() => {
@@ -153,7 +153,7 @@ export default function LookupPage() {
         document.body.appendChild(textArea);
         textArea.focus();
         textArea.select();
-        
+
         try {
             document.execCommand('copy');
             setCopied(true);
@@ -163,7 +163,7 @@ export default function LookupPage() {
             // As last resort, prompt user to manually copy
             window.prompt('Copy this link:', text);
         }
-        
+
         document.body.removeChild(textArea);
     };
 
@@ -381,13 +381,12 @@ export default function LookupPage() {
                                                     <Copy size={18} className="text-blue-400" />
                                                 )}
                                             </button>
-                                            
+
                                             {/* Tooltip - Desktop hover / shows "Copied!" on click */}
-                                            <span className={`absolute -top-8 left-1/2 -translate-x-1/2 px-2 py-1 rounded text-[10px] font-bold whitespace-nowrap transition-all duration-200 ${
-                                                copied 
-                                                    ? 'bg-green-500 text-white opacity-100 scale-100' 
+                                            <span className={`absolute -top-8 left-1/2 -translate-x-1/2 px-2 py-1 rounded text-[10px] font-bold whitespace-nowrap transition-all duration-200 ${copied
+                                                    ? 'bg-green-500 text-white opacity-100 scale-100'
                                                     : 'bg-gray-800 text-gray-300 opacity-0 group-hover/copy:opacity-100 scale-90 group-hover/copy:scale-100'
-                                            }`}>
+                                                }`}>
                                                 {copied ? 'Copied!' : 'Copy link'}
                                             </span>
                                         </div>

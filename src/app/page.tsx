@@ -119,7 +119,7 @@ export default function LandingPage() {
           </div>
 
           {/* Mobile Hamburger Button */}
-          <button 
+          <button
             className="md:hidden p-2 rounded-lg hover:bg-white/5 transition-colors"
             onClick={() => setMenuOpen(!menuOpen)}
             aria-label="Toggle menu"
@@ -139,24 +139,24 @@ export default function LandingPage() {
               className="md:hidden border-t border-white/5 bg-[#050505]/95 backdrop-blur-md overflow-hidden"
             >
               <div className="px-6 py-4 space-y-2">
-                <Link 
-                  href="/leaderboard" 
+                <Link
+                  href="/leaderboard"
                   onClick={() => setMenuOpen(false)}
                   className="flex items-center gap-3 w-full px-4 py-4 rounded-xl text-gray-300 hover:text-white hover:bg-white/5 transition-all font-medium"
                 >
                   <Layers size={20} />
                   Leaderboard
                 </Link>
-                <Link 
-                  href="/lookup" 
+                <Link
+                  href="/lookup"
                   onClick={() => setMenuOpen(false)}
                   className="flex items-center gap-3 w-full px-4 py-4 rounded-xl text-gray-300 hover:text-white hover:bg-white/5 transition-all font-medium"
                 >
                   <ShieldCheck size={20} />
                   Check Your Profile
                 </Link>
-                <Link 
-                  href="/waitlist" 
+                <Link
+                  href="/waitlist"
                   onClick={() => setMenuOpen(false)}
                   className="flex items-center justify-center gap-2 w-full px-4 py-4 rounded-xl bg-blue-600 text-white font-semibold hover:bg-blue-500 transition-all shadow-[0_0_15px_rgba(37,99,235,0.3)]"
                 >
@@ -312,7 +312,7 @@ export default function LandingPage() {
                 {/* <a href="#" className="w-10 h-10 rounded-full bg-white/5 border border-white/10 flex items-center justify-center transition-all duration-300 group hover:bg-[#0A66C2] hover:border-[#0A66C2] hover:shadow-[0_0_20px_rgba(10,102,194,0.5)]">
                   <Linkedin size={18} className="text-gray-400 group-hover:text-white transition-colors duration-300" />
                 </a> */}
-                <a href="#" className="w-10 h-10 rounded-full bg-white/5 border border-white/10 flex items-center justify-center transition-all duration-300 group hover:bg-[#5865F2] hover:border-[#5865F2] hover:shadow-[0_0_20px_rgba(88,101,242,0.5)]">
+                <a href="https://discord.gg/4TZNtxTc4p" target="_blank" rel="noopener noreferrer" className="w-10 h-10 rounded-full bg-white/5 border border-white/10 flex items-center justify-center transition-all duration-300 group hover:bg-[#5865F2] hover:border-[#5865F2] hover:shadow-[0_0_20px_rgba(88,101,242,0.5)]">
                   <svg viewBox="0 0 127.14 96.36" className="w-5 h-5 text-gray-400 fill-current group-hover:text-white transition-colors duration-300"><path d="M107.7,8.07A105.15,105.15,0,0,0,81.47,0a72.06,72.06,0,0,0-3.36,6.83A97.68,97.68,0,0,0,49,6.83,72.37,72.37,0,0,0,45.64,0,105.89,105.89,0,0,0,19.39,8.09C2.71,32.65-1.82,56.6.39,80.21a105.73,105.73,0,0,0,32.21,16.15,77.7,77.7,0,0,0,6.89-11.11,68.42,68.42,0,0,1-10.85-5.18c.91-.66,1.8-1.34,2.66-2a75.57,75.57,0,0,0,64.32,0c.87.71,1.76,1.39,2.66,2a68.68,68.68,0,0,1-10.87,5.19,77,77,0,0,0,6.89,11.1,105.25,105.25,0,0,0,32.24-16.14C129.5,50.2,120.78,26.52,107.7,8.07ZM42.45,65.69C36.18,65.69,31,60,31,53s5-12.74,11.43-12.74S54,45.91,53.89,53,48.84,65.69,42.45,65.69Zm42.24,0C78.41,65.69,73.25,60,73.25,53s5-12.74,11.44-12.74S96.23,45.91,96.11,53,91.06,65.69,84.69,65.69Z" /></svg>
                 </a>
                 <a href="https://t.me/+hT4Hrv0eicE0YzY0" target="_blank" rel="noopener noreferrer" className="w-10 h-10 rounded-full bg-white/5 border border-white/10 flex items-center justify-center transition-all duration-300 group hover:bg-[#0088cc] hover:border-[#0088cc] hover:shadow-[0_0_20px_rgba(0,136,204,0.5)]">
