@@ -12,7 +12,7 @@ function CheckEmailContent() {
   const router = useRouter()
   const searchParams = useSearchParams()
   const email = searchParams.get('email')
-  
+
   const [timeLeft, setTimeLeft] = useState(TIMER_DURATION)
   const [isExpired, setIsExpired] = useState(false)
   const [isLoaded, setIsLoaded] = useState(false)
@@ -20,16 +20,16 @@ function CheckEmailContent() {
   // Initialize timer from localStorage (persists across refresh)
   useEffect(() => {
     if (!email) return
-    
+
     const storageKey = `baserise_timer_${email}`
     const storedStartTime = localStorage.getItem(storageKey)
-    
+
     if (storedStartTime) {
       // Calculate remaining time based on when timer started
       const startTime = parseInt(storedStartTime, 10)
       const elapsed = Math.floor((Date.now() - startTime) / 1000)
       const remaining = Math.max(0, TIMER_DURATION - elapsed)
-      
+
       setTimeLeft(remaining)
       if (remaining <= 0) {
         setIsExpired(true)
@@ -38,19 +38,19 @@ function CheckEmailContent() {
       // First visit - store the start time
       localStorage.setItem(storageKey, Date.now().toString())
     }
-    
+
     setIsLoaded(true)
   }, [email])
 
   // Timer countdown
   useEffect(() => {
     if (!isLoaded || isExpired) return
-    
+
     if (timeLeft <= 0) {
       setIsExpired(true)
       return
     }
-    
+
     const timer = setInterval(() => {
       setTimeLeft(prev => {
         if (prev <= 1) {
@@ -60,7 +60,7 @@ function CheckEmailContent() {
         return prev - 1
       })
     }, 1000)
-    
+
     return () => clearInterval(timer)
   }, [timeLeft, isLoaded, isExpired])
 
@@ -82,7 +82,7 @@ function CheckEmailContent() {
     if (typeof window === 'undefined') return
 
     const channel = new BroadcastChannel('baserise_verification')
-    
+
     channel.onmessage = (event) => {
       if (event.data.type === 'EMAIL_VERIFIED' && event.data.email === email) {
         // Clear timer from localStorage
@@ -155,14 +155,14 @@ function CheckEmailContent() {
         />
       ))}
 
-      <motion.div 
+      <motion.div
         initial={{ opacity: 0, y: 30, scale: 0.95 }}
         animate={{ opacity: 1, y: 0, scale: 1 }}
         transition={{ duration: 0.6, ease: "easeOut" }}
         className="relative z-10 max-w-md w-full p-8 md:p-10 text-center backdrop-blur-2xl bg-white/[0.03] border border-white/10 rounded-[2.5rem] shadow-2xl"
       >
         {/* Icon with Animation */}
-        <motion.div 
+        <motion.div
           initial={{ scale: 0 }}
           animate={{ scale: 1 }}
           transition={{ type: "spring", stiffness: 200, delay: 0.2 }}
@@ -182,7 +182,7 @@ function CheckEmailContent() {
         </motion.div>
 
         {/* Title */}
-        <motion.h2 
+        <motion.h2
           initial={{ opacity: 0, y: 10 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.3 }}
@@ -205,7 +205,7 @@ function CheckEmailContent() {
         </motion.div>
 
         {/* Email Display */}
-        <motion.p 
+        <motion.p
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           transition={{ delay: 0.5 }}
@@ -231,7 +231,7 @@ function CheckEmailContent() {
         {/* Timer */}
         <AnimatePresence mode="wait">
           {!isExpired ? (
-            <motion.div 
+            <motion.div
               key="timer"
               initial={{ opacity: 0, scale: 0.9 }}
               animate={{ opacity: 1, scale: 1 }}
@@ -247,7 +247,7 @@ function CheckEmailContent() {
               </div>
             </motion.div>
           ) : (
-            <motion.div 
+            <motion.div
               key="expired"
               initial={{ opacity: 0, scale: 0.9 }}
               animate={{ opacity: 1, scale: 1 }}
@@ -260,7 +260,7 @@ function CheckEmailContent() {
                   <p className="text-sm text-gray-400">Please request a new verification email</p>
                 </div>
               </div>
-              <Link 
+              <Link
                 href="/"
                 onClick={handleTryAgain}
               >
@@ -278,7 +278,7 @@ function CheckEmailContent() {
         </AnimatePresence>
 
         {/* Waiting Status */}
-        <motion.div 
+        <motion.div
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           transition={{ delay: 0.7 }}

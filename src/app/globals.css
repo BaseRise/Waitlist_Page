@@ -2,8 +2,8 @@
 
 /* Agar purane Tailwind ke utilities masla karein to sirf ye use karein */
 @layer base {
-  :root { 
-    --base-blue: #0052FF; 
+  :root {
+    --base-blue: #0052FF;
   }
 
   body {
@@ -14,7 +14,9 @@
   }
 
   /* Smooth cursor for all interactive elements */
-  button, a, [role="button"] {
+  button,
+  a,
+  [role="button"] {
     cursor: pointer;
   }
 
@@ -25,35 +27,39 @@
 
 /* Custom Effects */
 @layer components {
+
   /* Moving Mesh Background */
   .mesh-bg {
-      position: fixed;
-      top: 0; left: 0; width: 100%; height: 100%;
-      background: 
-          radial-gradient(at 0% 0%, rgba(0, 82, 255, 0.15) 0px, transparent 50%),
-          radial-gradient(at 100% 100%, rgba(112, 0, 255, 0.1) 0px, transparent 50%);
-      z-index: -1;
-      will-change: transform;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background:
+      radial-gradient(at 0% 0%, rgba(0, 82, 255, 0.15) 0px, transparent 50%),
+      radial-gradient(at 100% 100%, rgba(112, 0, 255, 0.1) 0px, transparent 50%);
+    z-index: -1;
+    will-change: transform;
   }
 
   /* Shimmer Animation for Buttons */
   .btn-shimmer {
-      background: linear-gradient(110deg, #0052FF 45%, #4d89ff 50%, #0052FF 55%);
-      background-size: 200% 100%;
-      animation: shimmer 3s infinite linear;
+    background: linear-gradient(110deg, #0052FF 45%, #4d89ff 50%, #0052FF 55%);
+    background-size: 200% 100%;
+    animation: shimmer 3s infinite linear;
   }
 
   /* Floating Logo Animation */
   .float-animation {
-      animation: float 6s ease-in-out infinite;
+    animation: float 6s ease-in-out infinite;
   }
 
   /* Glassmorphism Input */
   .input-container {
-      background: rgba(255, 255, 255, 0.03);
-      border: 1px solid rgba(255, 255, 255, 0.1);
-      backdrop-filter: blur(20px);
-      transition: all 0.5s cubic-bezier(0.19, 1, 0.22, 1);
+    background: rgba(255, 255, 255, 0.03);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    backdrop-filter: blur(20px);
+    transition: all 0.5s cubic-bezier(0.19, 1, 0.22, 1);
   }
 
   /* Web3 Glow Effect */
@@ -101,19 +107,31 @@
 
 /* Keyframes */
 @keyframes shimmer {
-    to { background-position: -200% 0; }
+  to {
+    background-position: -200% 0;
+  }
 }
 
 @keyframes float {
-    0%, 100% { transform: translateY(0); }
-    50% { transform: translateY(-20px); }
+
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+
+  50% {
+    transform: translateY(-20px);
+  }
 }
 
 @keyframes pulseGlow {
-    0%, 100% { 
-      box-shadow: 0 0 20px -5px rgba(59, 130, 246, 0.4);
-    }
-    50% { 
-      box-shadow: 0 0 40px -5px rgba(59, 130, 246, 0.6);
-    }
+
+  0%,
+  100% {
+    box-shadow: 0 0 20px -5px rgba(59, 130, 246, 0.4);
+  }
+
+  50% {
+    box-shadow: 0 0 40px -5px rgba(59, 130, 246, 0.6);
+  }
 }

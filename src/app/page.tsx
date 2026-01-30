@@ -5,7 +5,11 @@ import { motion, AnimatePresence } from "framer-motion";
 import Link from "next/link";
 import {
   ArrowRight, Loader2, CheckCircle2, AlertCircle,
+<<<<<<< HEAD
   Github, Linkedin, Send, Twitter, Layers, Zap, ShieldCheck, AlertTriangle, X
+=======
+  Github, Linkedin, Send, Twitter, Layers, Zap, ShieldCheck, Menu, X
+>>>>>>> social-addition
 } from "lucide-react";
 
 // ==========================================
@@ -46,6 +50,7 @@ export default function LandingPage() {
   const [newsEmail, setNewsEmail] = useState("");
   const [submitting, setSubmitting] = useState(false);
   const [message, setMessage] = useState<{ text: string; type: 'success' | 'error' } | null>(null);
+<<<<<<< HEAD
   const [showBanner, setShowBanner] = useState(true);
   const [bannerHeight, setBannerHeight] = useState(44);
   const [bannerClosed, setBannerClosed] = useState(false); // Track if user manually closed
@@ -101,6 +106,9 @@ export default function LandingPage() {
     setBannerClosed(true);
     setShowBanner(false);
   };
+=======
+  const [menuOpen, setMenuOpen] = useState(false);
+>>>>>>> social-addition
 
   // Auto-hide message after 5 seconds
   useEffect(() => {
@@ -115,6 +123,20 @@ export default function LandingPage() {
   // 2. Newsletter Handler
   const handleNewsletterSubmit = async () => {
     if (!newsEmail) return;
+    // 1. Regex Validation: Sirf sahi email format allow hoga
+    // Is se koi hacker 'javascript:alert()' jaisi cheezein nahi daal sakega
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(newsEmail)) {
+      setMessage({ text: "Please enter a valid email address.", type: 'error' });
+      return;
+    }
+
+    // 2. Sanitization: Dangerous symbols ko khatam karna
+    // Agar koi '<script>' likhay ga toh hum usey 'clean' kar denge
+    const cleanEmail = newsEmail.replace(/[<>]/g, "").trim().toLowerCase();
+
+    setSubmitting(true);
+    setMessage(null);
 
     setSubmitting(true);
     setMessage(null);
@@ -177,15 +199,76 @@ export default function LandingPage() {
             <span className="text-lg md:text-xl font-semibold tracking-tight">BaseRise</span>
           </div>
 
-          {/* Right Side Actions - Only Waitlist for now */}
-          <div className="flex items-center gap-4">
+          {/* Center: Leaderboard & Check Profile Links - Desktop Only */}
+          <div className="absolute left-1/2 -translate-x-1/2 hidden md:flex items-center gap-8">
+            <Link href="/leaderboard" className="text-gray-400 hover:text-blue-500 transition-colors font-medium flex items-center gap-2">
+              <Layers size={18} />
+              Leaderboard
+            </Link>
+            <Link href="/lookup" className="text-gray-400 hover:text-blue-500 transition-colors font-medium flex items-center gap-2">
+              <ShieldCheck size={18} />
+              Check Your Profile
+            </Link>
+          </div>
+
+          {/* Right Side Actions - Desktop Only */}
+          <div className="hidden md:flex items-center gap-4">
             <Link href="/waitlist">
               <button className="px-4 md:px-5 py-2 md:py-2.5 bg-blue-600 text-white font-semibold rounded-full text-xs md:text-sm hover:bg-blue-500 transition-all shadow-[0_0_15px_rgba(37,99,235,0.3)]">
                 Join Waitlist
               </button>
             </Link>
           </div>
+
+          {/* Mobile Hamburger Button */}
+          <button
+            className="md:hidden p-2 rounded-lg hover:bg-white/5 transition-colors"
+            onClick={() => setMenuOpen(!menuOpen)}
+            aria-label="Toggle menu"
+          >
+            {menuOpen ? <X size={24} /> : <Menu size={24} />}
+          </button>
         </div>
+
+        {/* Mobile Full-Width Dropdown Menu */}
+        <AnimatePresence>
+          {menuOpen && (
+            <motion.div
+              initial={{ opacity: 0, height: 0 }}
+              animate={{ opacity: 1, height: 'auto' }}
+              exit={{ opacity: 0, height: 0 }}
+              transition={{ duration: 0.2 }}
+              className="md:hidden border-t border-white/5 bg-[#050505]/95 backdrop-blur-md overflow-hidden"
+            >
+              <div className="px-6 py-4 space-y-2">
+                <Link
+                  href="/leaderboard"
+                  onClick={() => setMenuOpen(false)}
+                  className="flex items-center gap-3 w-full px-4 py-4 rounded-xl text-gray-300 hover:text-white hover:bg-white/5 transition-all font-medium"
+                >
+                  <Layers size={20} />
+                  Leaderboard
+                </Link>
+                <Link
+                  href="/lookup"
+                  onClick={() => setMenuOpen(false)}
+                  className="flex items-center gap-3 w-full px-4 py-4 rounded-xl text-gray-300 hover:text-white hover:bg-white/5 transition-all font-medium"
+                >
+                  <ShieldCheck size={20} />
+                  Check Your Profile
+                </Link>
+                <Link
+                  href="/waitlist"
+                  onClick={() => setMenuOpen(false)}
+                  className="flex items-center justify-center gap-2 w-full px-4 py-4 rounded-xl bg-blue-600 text-white font-semibold hover:bg-blue-500 transition-all shadow-[0_0_15px_rgba(37,99,235,0.3)]"
+                >
+                  Join Waitlist
+                  <ArrowRight size={18} />
+                </Link>
+              </div>
+            </motion.div>
+          )}
+        </AnimatePresence>
       </nav>
 
       {/* ==========================================
@@ -331,10 +414,17 @@ export default function LandingPage() {
                 {/* <a href="#" className="w-10 h-10 rounded-full bg-white/5 border border-white/10 flex items-center justify-center transition-all duration-300 group hover:bg-[#0A66C2] hover:border-[#0A66C2] hover:shadow-[0_0_20px_rgba(10,102,194,0.5)]">
                   <Linkedin size={18} className="text-gray-400 group-hover:text-white transition-colors duration-300" />
                 </a> */}
+<<<<<<< HEAD
                 <a href="#" className="w-10 h-10 rounded-full bg-white/5 border border-white/10 flex items-center justify-center transition-all duration-300 group hover:bg-[#333] hover:border-white/20 hover:shadow-[0_0_20px_rgba(255,255,255,0.2)]">
                   <Github size={18} className="text-gray-400 group-hover:text-white transition-colors duration-300" />
                 </a>
                 <a href="#" className="w-10 h-10 rounded-full bg-white/5 border border-white/10 flex items-center justify-center transition-all duration-300 group hover:bg-[#0088cc] hover:border-[#0088cc] hover:shadow-[0_0_20px_rgba(0,136,204,0.5)]">
+=======
+                <a href="https://discord.gg/4TZNtxTc4p" target="_blank" rel="noopener noreferrer" className="w-10 h-10 rounded-full bg-white/5 border border-white/10 flex items-center justify-center transition-all duration-300 group hover:bg-[#5865F2] hover:border-[#5865F2] hover:shadow-[0_0_20px_rgba(88,101,242,0.5)]">
+                  <svg viewBox="0 0 127.14 96.36" className="w-5 h-5 text-gray-400 fill-current group-hover:text-white transition-colors duration-300"><path d="M107.7,8.07A105.15,105.15,0,0,0,81.47,0a72.06,72.06,0,0,0-3.36,6.83A97.68,97.68,0,0,0,49,6.83,72.37,72.37,0,0,0,45.64,0,105.89,105.89,0,0,0,19.39,8.09C2.71,32.65-1.82,56.6.39,80.21a105.73,105.73,0,0,0,32.21,16.15,77.7,77.7,0,0,0,6.89-11.11,68.42,68.42,0,0,1-10.85-5.18c.91-.66,1.8-1.34,2.66-2a75.57,75.57,0,0,0,64.32,0c.87.71,1.76,1.39,2.66,2a68.68,68.68,0,0,1-10.87,5.19,77,77,0,0,0,6.89,11.1,105.25,105.25,0,0,0,32.24-16.14C129.5,50.2,120.78,26.52,107.7,8.07ZM42.45,65.69C36.18,65.69,31,60,31,53s5-12.74,11.43-12.74S54,45.91,53.89,53,48.84,65.69,42.45,65.69Zm42.24,0C78.41,65.69,73.25,60,73.25,53s5-12.74,11.44-12.74S96.23,45.91,96.11,53,91.06,65.69,84.69,65.69Z" /></svg>
+                </a>
+                <a href="https://t.me/+hT4Hrv0eicE0YzY0" target="_blank" rel="noopener noreferrer" className="w-10 h-10 rounded-full bg-white/5 border border-white/10 flex items-center justify-center transition-all duration-300 group hover:bg-[#0088cc] hover:border-[#0088cc] hover:shadow-[0_0_20px_rgba(0,136,204,0.5)]">
+>>>>>>> social-addition
                   <Send size={18} className="text-gray-400 group-hover:text-white transition-colors duration-300" />
                 </a>
               </div>

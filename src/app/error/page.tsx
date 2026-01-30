@@ -8,32 +8,32 @@ export default function ErrorPage() {
     <div className="min-h-screen flex items-center justify-center bg-[#030303] text-white font-sans overflow-hidden px-4">
       {/* Animated Background */}
       <div className="absolute inset-0 overflow-hidden">
-        <motion.div 
-          animate={{ 
+        <motion.div
+          animate={{
             scale: [1, 1.2, 1],
-            opacity: [0.1, 0.15, 0.1] 
+            opacity: [0.1, 0.15, 0.1]
           }}
           transition={{ duration: 4, repeat: Infinity }}
           className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[500px] h-[500px] bg-red-600/20 blur-[150px] rounded-full"
         />
-        <motion.div 
-          animate={{ 
+        <motion.div
+          animate={{
             scale: [1.2, 1, 1.2],
-            opacity: [0.1, 0.15, 0.1] 
+            opacity: [0.1, 0.15, 0.1]
           }}
           transition={{ duration: 5, repeat: Infinity }}
           className="absolute top-[-10%] right-[-10%] w-[300px] h-[300px] bg-orange-600/15 blur-[100px] rounded-full"
         />
       </div>
 
-      <motion.div 
+      <motion.div
         initial={{ scale: 0.8, opacity: 0, y: 20 }}
         animate={{ scale: 1, opacity: 1, y: 0 }}
         transition={{ type: "spring", stiffness: 100 }}
         className="relative z-10 max-w-lg w-full p-10 text-center backdrop-blur-2xl bg-gradient-to-b from-red-600/10 to-transparent rounded-[3rem] border border-red-500/20 shadow-2xl"
       >
         {/* Error Icon */}
-        <motion.div 
+        <motion.div
           initial={{ scale: 0, rotate: -180 }}
           animate={{ scale: 1, rotate: 0 }}
           transition={{ type: "spring", stiffness: 150, delay: 0.2 }}

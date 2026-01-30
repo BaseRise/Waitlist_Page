@@ -60,16 +60,16 @@ export default function VerifiedSuccess() {
 
   const handleFinalize = async () => {
     if (!userEmail || !userId) return
-    
+
     setIsUpdating(true)
     try {
       const { data: { session } } = await supabase.auth.getSession()
-      
+
       const response = await fetch('/api/auth/verify-user', {
         method: 'POST',
-        headers: { 
+        headers: {
           'Content-Type': 'application/json',
-          'Authorization': `Bearer ${session?.access_token}` 
+          'Authorization': `Bearer ${session?.access_token}`
         },
         body: JSON.stringify({ email: userEmail, userId: userId })
       })
@@ -79,7 +79,7 @@ export default function VerifiedSuccess() {
         const channel = new BroadcastChannel('baserise_verification')
         channel.postMessage({ type: 'EMAIL_VERIFIED', email: userEmail })
         setTimeout(() => channel.close(), 1000)
-        
+
         localStorage.removeItem(`baserise_timer_${userEmail}`)
         setStatus('success')
       } else {
@@ -94,13 +94,13 @@ export default function VerifiedSuccess() {
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-[#030303] text-white font-sans overflow-hidden px-4 relative">
-      
+
       {/* Background Gradients */}
       <div className="absolute top-[-20%] left-[-10%] w-[500px] h-[500px] bg-blue-600/20 blur-[120px] rounded-full mix-blend-screen" />
       <div className="absolute bottom-[-20%] right-[-10%] w-[500px] h-[500px] bg-purple-600/20 blur-[120px] rounded-full mix-blend-screen" />
 
       <AnimatePresence mode="wait">
-        
+
         {/* STATE: LOADING */}
         {status === 'verifying' && (
           <motion.div key="loading" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="text-center z-10">
@@ -114,7 +114,7 @@ export default function VerifiedSuccess() {
 
         {/* STATE: FINALIZE BUTTON (Only for new verifications) */}
         {status === 'confirmed' && (
-          <motion.div 
+          <motion.div
             key="confirm"
             initial={{ scale: 0.9, opacity: 0, y: 20 }}
             animate={{ scale: 1, opacity: 1, y: 0 }}
@@ -125,15 +125,15 @@ export default function VerifiedSuccess() {
               <div className="w-20 h-20 mx-auto mb-6 bg-blue-500/10 rounded-2xl flex items-center justify-center border border-blue-500/20 shadow-[0_0_30px_-5px_rgba(59,130,246,0.3)]">
                 <ShieldCheck size={40} className="text-blue-500" />
               </div>
-              
+
               <h1 className="text-3xl font-black uppercase italic tracking-tighter mb-3">
                 Finalize <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-400 to-purple-400">Access</span>
               </h1>
               <p className="text-gray-400 text-sm mb-8 leading-relaxed">
                 Your email is confirmed. Click below to cryptographically link your identity to the waitlist.
               </p>
-              
-              <motion.button 
+
+              <motion.button
                 whileHover={{ scale: 1.02 }}
                 whileTap={{ scale: 0.98 }}
                 onClick={handleFinalize}
@@ -151,7 +151,7 @@ export default function VerifiedSuccess() {
 
         {/* STATE: SUCCESS (Just verified) */}
         {status === 'success' && (
-          <motion.div 
+          <motion.div
             key="success"
             initial={{ scale: 0.9, opacity: 0 }}
             animate={{ scale: 1, opacity: 1 }}
@@ -167,7 +167,7 @@ export default function VerifiedSuccess() {
 
         {/* STATE: ALREADY VERIFIED (Revisit fix) */}
         {status === 'already_verified' && (
-          <motion.div 
+          <motion.div
             key="already"
             initial={{ scale: 0.9, opacity: 0 }}
             animate={{ scale: 1, opacity: 1 }}
