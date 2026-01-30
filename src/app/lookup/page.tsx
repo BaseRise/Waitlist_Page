@@ -4,6 +4,7 @@ import { useState, useEffect } from "react";
 import { createClient } from "@supabase/supabase-js";
 import { motion, AnimatePresence } from "framer-motion";
 import { Loader2, Mail, Lock, ArrowRight, Trophy, Users, Star, Copy, Check } from "lucide-react";
+import { FaWhatsapp, FaXTwitter } from "react-icons/fa6";
 import Link from "next/link";
 
 // Supabase Client (Frontend wala)
@@ -392,8 +393,38 @@ export default function LookupPage() {
                                         </div>
                                     </div>
 
-                                    <p className="text-[10px] text-gray-500 mt-2 text-center">
-                                        Share this link to boost your rank.
+                                    <p className="text-[10px] text-gray-500 mt-3 text-center flex items-center justify-center gap-3">
+                                        <span>Share this link to boost your rank</span>
+                                        
+                                        {/* Twitter/X Share Button */}
+                                        <motion.a
+                                            href={`https://twitter.com/intent/tweet?text=${encodeURIComponent(`🚀 I just secured my spot on @BaseRise waitlist!\n\nJoin me and get early access 👇\n${typeof window !== 'undefined' ? window.location.origin : ''}/waitlist?ref=${stats.ref_code}`)}`}
+                                            target="_blank"
+                                            rel="noopener noreferrer"
+                                            className="group relative w-8 h-8 rounded-full bg-white/5 border border-white/10 flex items-center justify-center cursor-pointer hover:bg-white hover:border-white transition-all duration-300"
+                                            whileHover={{ scale: 1.15, y: -2 }}
+                                            whileTap={{ scale: 0.95 }}
+                                        >
+                                            <FaXTwitter size={14} className="text-gray-400 group-hover:text-black transition-colors duration-300" />
+                                            <span className="absolute -top-8 left-1/2 -translate-x-1/2 px-2 py-1 bg-white text-black text-[9px] font-bold rounded opacity-0 group-hover:opacity-100 scale-90 group-hover:scale-100 transition-all duration-200 whitespace-nowrap shadow-lg">
+                                                Share to X
+                                            </span>
+                                        </motion.a>
+
+                                        {/* WhatsApp Share Button */}
+                                        <motion.a
+                                            href={`https://wa.me/?text=${encodeURIComponent(`🚀 Hey! I just joined the BaseRise waitlist and secured my early access spot!\n\nYou should join too before spots fill up 👇\n${typeof window !== 'undefined' ? window.location.origin : ''}/waitlist?ref=${stats.ref_code}`)}`}
+                                            target="_blank"
+                                            rel="noopener noreferrer"
+                                            className="group relative w-8 h-8 rounded-full bg-white/5 border border-white/10 flex items-center justify-center cursor-pointer hover:bg-green-500 hover:border-green-500 transition-all duration-300"
+                                            whileHover={{ scale: 1.15, y: -2 }}
+                                            whileTap={{ scale: 0.95 }}
+                                        >
+                                            <FaWhatsapp size={15} className="text-gray-400 group-hover:text-white transition-colors duration-300" />
+                                            <span className="absolute -top-8 left-1/2 -translate-x-1/2 px-2 py-1 bg-green-500 text-white text-[9px] font-bold rounded opacity-0 group-hover:opacity-100 scale-90 group-hover:scale-100 transition-all duration-200 whitespace-nowrap shadow-lg">
+                                                Share to WhatsApp
+                                            </span>
+                                        </motion.a>
                                     </p>
                                 </div>
 

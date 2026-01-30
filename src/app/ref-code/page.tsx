@@ -1,20 +1,42 @@
 'use client'
-import { useState, useEffect, Suspense } from 'react'
+import { useState, useEffect } from 'react'
 import { motion } from 'framer-motion'
-import { Copy, Check, Users, Share2, Loader2, ArrowRight, Trophy, Link as LinkIcon, Zap, Crown, Sparkles } from 'lucide-react'
-import { useSearchParams } from 'next/navigation'
+import { Copy, Check, Users, Share2, Loader2, ArrowRight, Trophy, Link as LinkIcon, Zap, ShieldAlert } from 'lucide-react'
 import { supabase } from '@/app/lib/supabase'
 import Link from 'next/link'
 
 function RefCodeContent() {
-  const searchParams = useSearchParams()
-  const email = searchParams.get('email')
-
+  const [email, setEmail] = useState<string | null>(null)
   const [refCode, setRefCode] = useState<string | null>(null)
   const [copied, setCopied] = useState(false)
   const [loading, setLoading] = useState(true)
+  const [authError, setAuthError] = useState(false)
   const [referralCount, setReferralCount] = useState(0)
   const [position, setPosition] = useState<number | null>(null)
+
+  // 🔒 100% SECURE: Get email from Supabase Auth Session (tamper-proof)
+  useEffect(() => {
+    const getAuthenticatedUser = async () => {
+      try {
+        const { data: { session }, error } = await supabase.auth.getSession()
+        
+        if (error || !session?.user?.email) {
+          // No valid session - user not authenticated
+          setAuthError(true)
+          setLoading(false)
+          return
+        }
+
+        // ✅ Email comes from Supabase Auth - cannot be tampered
+        setEmail(session.user.email)
+      } catch (err) {
+        setAuthError(true)
+        setLoading(false)
+      }
+    }
+    
+    getAuthenticatedUser()
+  }, [])
 
   useEffect(() => {
     if (!email) return
@@ -39,7 +61,6 @@ function RefCodeContent() {
           setReferralCount(refCount || 0)
 
           // Calculate position based on verified users before this user + referral bonus
-          // Position = (Total verified users before you) - (your referrals * 5) + 1
           const { count: usersBeforeCount } = await supabase
             .from('waitlist')
             .select('*', { count: 'exact', head: true })
@@ -47,7 +68,7 @@ function RefCodeContent() {
             .lt('created_at', userData.created_at)
 
           const basePosition = (usersBeforeCount || 0) + 1
-          const referralBoost = (refCount || 0) * 5 // Each referral moves you up 5 spots
+          const referralBoost = (refCount || 0) * 5
           const finalPosition = Math.max(1, basePosition - referralBoost)
 
           setPosition(finalPosition)
@@ -67,7 +88,37 @@ function RefCodeContent() {
     setTimeout(() => setCopied(false), 2000)
   }
 
+  // Loading State
   if (loading) return <div className="min-h-screen flex items-center justify-center bg-[#030303]"><Loader2 className="animate-spin text-blue-500" /></div>
+
+  // 🔒 Auth Error - User not logged in
+  if (authError) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-[#030303] text-white px-4">
+        <motion.div
+          initial={{ scale: 0.9, opacity: 0 }}
+          animate={{ scale: 1, opacity: 1 }}
+          className="max-w-md w-full p-8 text-center bg-black/40 backdrop-blur-xl rounded-[2rem] border border-red-500/20"
+        >
+          <div className="w-20 h-20 mx-auto mb-6 bg-red-500/10 rounded-full flex items-center justify-center border border-red-500/20">
+            <ShieldAlert size={40} className="text-red-400" />
+          </div>
+          <h1 className="text-2xl font-black uppercase italic tracking-tight text-white mb-2">Access Denied</h1>
+          <p className="text-gray-400 text-sm mb-6">You need to verify your email first to view your dashboard.</p>
+          <Link href="/waitlist">
+            <motion.span
+              whileHover={{ scale: 1.05 }}
+              whileTap={{ scale: 0.95 }}
+              className="inline-flex items-center gap-2 px-6 py-3 bg-gradient-to-r from-blue-600 to-indigo-600 rounded-xl text-xs font-bold uppercase tracking-widest cursor-pointer"
+            >
+              Join Waitlist
+              <ArrowRight size={14} />
+            </motion.span>
+          </Link>
+        </motion.div>
+      </div>
+    )
+  }
 
   return (
     <div className="min-h-screen flex flex-col items-center justify-center bg-[#030303] text-white font-sans overflow-hidden px-4 relative">
@@ -212,10 +263,4 @@ function RefCodeContent() {
   )
 }
 
-export default function RefCodePage() {
-  return (
-    <Suspense fallback={<div className="bg-black min-h-screen" />}>
-      <RefCodeContent />
-    </Suspense>
-  )
-}
+export default RefCodeContent

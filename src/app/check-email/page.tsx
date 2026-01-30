@@ -88,9 +88,11 @@ function CheckEmailContent() {
         // Clear timer from localStorage
         if (email) {
           localStorage.removeItem(`baserise_timer_${email}`)
+          // Store email securely in localStorage (no URL exposure)
+          localStorage.setItem('baserise_verified_email', email)
         }
-        // Immediately redirect to ref-code page
-        router.push(`/ref-code?email=${encodeURIComponent(email || '')}`)
+        // Redirect to ref-code page without email in URL
+        router.push('/ref-code')
       }
     }
 
@@ -112,7 +114,9 @@ function CheckEmailContent() {
         if (data && data.is_verified === true) {
           // Clear timer from localStorage
           localStorage.removeItem(`baserise_timer_${email}`)
-          router.push(`/ref-code?email=${encodeURIComponent(email)}`)
+          // Store email securely in localStorage (no URL exposure)
+          localStorage.setItem('baserise_verified_email', email)
+          router.push('/ref-code')
         }
       } catch (error) {
         console.error("Verification check failed", error)
