@@ -22,7 +22,7 @@ export async function GET(request: NextRequest) {
       token_hash,
     })
 
-    if (!error && data.user && data.user.email) {
+    if (!error && data.user && data.user.email && data.session) {
       // Database mein Verified status True karein - EMAIL se match karo
       await supabaseAdmin
         .from('waitlist')
@@ -33,13 +33,21 @@ export async function GET(request: NextRequest) {
         })
         .eq('email', data.user.email)
 
-      // User ko Confirmation Page par redirect karein WITH EMAIL
+      // User ko Confirmation Page par redirect karein WITH TOKENS in hash
+      // Ye tokens verified page par session set karne ke liye use honge
       const redirectTo = request.nextUrl.clone()
       redirectTo.pathname = next
       redirectTo.searchParams.delete('token_hash')
       redirectTo.searchParams.delete('type')
-      redirectTo.searchParams.set('email', data.user.email)
-      return NextResponse.redirect(redirectTo)
+      
+      // Pass tokens via hash fragment (more secure than query params)
+      const hashParams = new URLSearchParams({
+        access_token: data.session.access_token,
+        refresh_token: data.session.refresh_token,
+        type: 'magiclink'
+      })
+      
+      return NextResponse.redirect(`${redirectTo.origin}${redirectTo.pathname}#${hashParams.toString()}`)
     }
   }
 

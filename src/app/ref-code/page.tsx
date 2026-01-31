@@ -1,7 +1,7 @@
 'use client'
 import { useState, useEffect } from 'react'
 import { motion } from 'framer-motion'
-import { Copy, Check, Users, Share2, Loader2, ArrowRight, Trophy, Link as LinkIcon, Zap, ShieldAlert } from 'lucide-react'
+import { Copy, Check, Users, Share2, Loader2, ArrowRight, Trophy, Link as LinkIcon, Zap, ShieldAlert, X } from 'lucide-react'
 import { supabase } from '@/app/lib/supabase'
 import Link from 'next/link'
 
@@ -18,9 +18,22 @@ function RefCodeContent() {
   useEffect(() => {
     const getAuthenticatedUser = async () => {
       try {
-        const { data: { session }, error } = await supabase.auth.getSession()
-        
-        if (error || !session?.user?.email) {
+        // Small delay to ensure session is properly loaded after redirect
+        await new Promise(resolve => setTimeout(resolve, 100))
+
+        let session = null
+
+        // Try to get session, with retry
+        for (let i = 0; i < 3; i++) {
+          const { data, error } = await supabase.auth.getSession()
+          if (!error && data.session?.user?.email) {
+            session = data.session
+            break
+          }
+          await new Promise(resolve => setTimeout(resolve, 500))
+        }
+
+        if (!session?.user?.email) {
           // No valid session - user not authenticated
           setAuthError(true)
           setLoading(false)
@@ -28,13 +41,15 @@ function RefCodeContent() {
         }
 
         // ✅ Email comes from Supabase Auth - cannot be tampered
+        console.log('🔐 Session email:', session.user.email)
         setEmail(session.user.email)
       } catch (err) {
+        console.error('Session error:', err)
         setAuthError(true)
         setLoading(false)
       }
     }
-    
+
     getAuthenticatedUser()
   }, [])
 
@@ -42,12 +57,27 @@ function RefCodeContent() {
     if (!email) return
     const fetchUserData = async () => {
       try {
-        // Fetch user's ref_code
-        const { data: userData } = await supabase
+        // Get current session for authenticated request
+        const { data: { session } } = await supabase.auth.getSession()
+
+        if (!session) {
+          console.log('No session for data fetch')
+          setLoading(false)
+          return
+        }
+
+        // Fetch user's ref_code and is_verified status
+        const { data: userData, error: userError } = await supabase
           .from('waitlist')
-          .select('ref_code, created_at')
+          .select('ref_code, created_at, is_verified')
           .eq('email', email)
           .single()
+        console.log('📧 Querying database for email:', email)
+        console.log('User data fetched:', userData, userError)
+
+        if (userError) {
+          console.error('Error fetching user data:', userError)
+        }
 
         if (userData?.ref_code) {
           setRefCode(userData.ref_code)
@@ -239,23 +269,22 @@ function RefCodeContent() {
           </div>
         </div>
 
-        {/* Back Button */}
+        {/* Close Button */}
         <motion.div
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           transition={{ delay: 0.5 }}
           className="mt-8 text-center"
         >
-          <Link href="/">
-            <motion.span
-              whileHover={{ scale: 1.05, x: 5 }}
-              whileTap={{ scale: 0.95 }}
-              className="inline-flex items-center gap-2 px-6 py-3 rounded-full text-xs font-bold uppercase tracking-widest text-gray-400 hover:text-white bg-white/0 hover:bg-white/5 border border-transparent hover:border-white/10 transition-all duration-300 cursor-pointer group"
-            >
-              <span>Go to Main Page</span>
-              <ArrowRight size={14} className="group-hover:translate-x-1 transition-transform" />
-            </motion.span>
-          </Link>
+          <motion.button
+            onClick={() => window.close()}
+            whileHover={{ scale: 1.05 }}
+            whileTap={{ scale: 0.95 }}
+            className="inline-flex items-center gap-2 px-6 py-3 rounded-full text-xs font-bold uppercase tracking-widest text-gray-400 hover:text-white bg-white/0 hover:bg-white/5 border border-transparent hover:border-white/10 transition-all duration-300 cursor-pointer group"
+          >
+            <X size={14} />
+            <span>Close This Page</span>
+          </motion.button>
         </motion.div>
 
       </motion.div>

@@ -14,10 +14,22 @@ async function isValidEmailDomain(email: string): Promise<boolean> {
   try {
     const domain = email.split('@')[1]
     if (!domain) return false
-    const mxRecords = await resolveMx(domain)
-    return mxRecords && mxRecords.length > 0
+
+    // Add timeout to prevent cold start hanging
+    const timeoutPromise = new Promise<null>((_, reject) =>
+      setTimeout(() => reject(new Error('DNS timeout')), 5000)
+    )
+
+    const mxRecords = await Promise.race([resolveMx(domain), timeoutPromise])
+    return !!(mxRecords && mxRecords.length > 0)
   } catch (error) {
     console.log(`❌ DNS Check Failed for: ${email}`, error)
+    // On timeout or error, allow common email providers
+    const domain = email.split('@')[1]?.toLowerCase()
+    const trustedDomains = ['gmail.com', 'yahoo.com', 'hotmail.com', 'outlook.com', 'icloud.com', 'protonmail.com', 'live.com', 'msn.com']
+    if (trustedDomains.includes(domain)) {
+      return true
+    }
     return false
   }
 }
@@ -51,13 +63,13 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'A valid email is required' }, { status: 400 });
     }
 
-    const isDomainValid = await isValidEmailDomain(email);
-    if (!isDomainValid) {
-      return NextResponse.json({ error: 'Invalid email domain.' }, { status: 400 });
-    }
+    // const isDomainValid = await isValidEmailDomain(email);
+    // if (!isDomainValid) {
+    //   return NextResponse.json({ error: 'Invalid email domain.' }, { status: 400 });
+    // }
 
     const origin = request.headers.get('origin');
-    const siteUrl = origin || process.env.NEXT_PUBLIC_SITE_URL || 'https://baserise.vercel.app';
+    const siteUrl = origin || process.env.NEXT_PUBLIC_SITE_URL || 'https://baserise.online';
     const supabaseAdmin = getSupabaseAdmin()
 
     // --- 1. Check Existing User ---
@@ -67,6 +79,10 @@ export async function POST(request: NextRequest) {
       .eq('email', email)
       .single()
 
+    // Check if user exists in Supabase Auth
+    const { data: authUsers } = await supabaseAdmin.auth.admin.listUsers()
+    const userExistsInAuth = authUsers?.users?.some(u => u.email === email)
+
     if (existingUser) {
       if (existingUser.is_verified) {
         return NextResponse.json({
@@ -74,10 +90,9 @@ export async function POST(request: NextRequest) {
           refCode: existingUser.ref_code
         }, { status: 400 })
       } else {
-        // ✅ CASE A: Existing User -> Use 'magiclink' (No password needed)
-        
+        // Existing user - always use magiclink
         const { data: linkData, error: linkError } = await supabaseAdmin.auth.admin.generateLink({
-          type: 'magiclink', // 👈 CHANGED: signup -> magiclink
+          type: 'magiclink',
           email: email,
           options: { redirectTo: `${siteUrl}/verified` }
         });
@@ -89,15 +104,15 @@ export async function POST(request: NextRequest) {
           to: email,
           subject: 'Confirm your genesis spot on BaseRise 🚀',
           html: `
-            <div style="font-family: sans-serif; text-align: center;">
-              <h2>Welcome Back!</h2>
-              <p>It seems you didn't verify your spot yet. Click below:</p>
-              <a href="${linkData.properties.action_link}" 
-                 style="background:#2563eb; color:white; padding:12px 24px; text-decoration:none; border-radius:8px; display:inline-block; font-weight:bold;">
-                CONFIRM MY SPOT
-              </a>
-            </div>
-          `
+        <div style="font-family: sans-serif; text-align: center;">
+          <h2>Welcome Back!</h2>
+          <p>It seems you didn't verify your spot yet. Click below:</p>
+          <a href="${linkData.properties.action_link}" 
+             style="background:#2563eb; color:white; padding:12px 24px; text-decoration:none; border-radius:8px; display:inline-block; font-weight:bold;">
+            CONFIRM MY SPOT
+          </a>
+        </div>
+      `
         });
 
         return NextResponse.json({ success: true, message: 'Verification email resent!' })
@@ -120,17 +135,21 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'Failed to add to waitlist' }, { status: 500 })
     }
 
-    // ✅ CASE B: New User -> Use 'signup' WITH Dummy Password
-    
-    const { data: linkData, error: linkError } = await supabaseAdmin.auth.admin.generateLink({
-      type: 'signup',
+    // Use magiclink if user exists in Auth, otherwise signup
+    const linkType = userExistsInAuth ? 'magiclink' : 'signup'
+    const linkOptions: any = {
+      type: linkType,
       email: email,
-      password: crypto.randomBytes(16).toString('hex'), // 👈 ADDED: Dummy password to satisfy TS
       options: { redirectTo: `${siteUrl}/verified` }
-    });
+    }
+
+    if (linkType === 'signup') {
+      linkOptions.password = crypto.randomBytes(16).toString('hex')
+    }
+
+    const { data: linkData, error: linkError } = await supabaseAdmin.auth.admin.generateLink(linkOptions)
 
     if (linkError) throw linkError;
-
     await resend.emails.send({
       from: 'BaseRise Confirmation <verify@baserise.online>',
       to: email,
@@ -155,6 +174,16 @@ export async function POST(request: NextRequest) {
 
   } catch (error) {
     console.error('Waitlist API error:', error)
-    return NextResponse.json({ error: 'Internal server error' }, { status: 500 })
+    // Better error logging
+    if (error instanceof Error) {
+      console.error('Error details:', {
+        message: error.message,
+        stack: error.stack
+      })
+    }
+    return NextResponse.json({
+      error: 'Internal server error',
+      details: process.env.NODE_ENV === 'development' ? String(error) : undefined
+    }, { status: 500 })
   }
 }

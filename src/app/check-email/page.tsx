@@ -1,7 +1,7 @@
 'use client'
 import { useState, useEffect, Suspense } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
-import { Mail, Clock, Loader2, Sparkles, Shield, AlertTriangle, RefreshCw } from 'lucide-react'
+import { Mail, Clock, Loader2, Sparkles, Shield, AlertTriangle, RefreshCw, CheckCircle2, Home, ArrowRight } from 'lucide-react'
 import { useSearchParams, useRouter } from 'next/navigation'
 import Link from 'next/link'
 import { supabase } from '@/app/lib/supabase'
@@ -16,6 +16,7 @@ function CheckEmailContent() {
   const [timeLeft, setTimeLeft] = useState(TIMER_DURATION)
   const [isExpired, setIsExpired] = useState(false)
   const [isLoaded, setIsLoaded] = useState(false)
+  const [isVerified, setIsVerified] = useState(false)
 
   // Initialize timer from localStorage (persists across refresh)
   useEffect(() => {
@@ -91,8 +92,8 @@ function CheckEmailContent() {
           // Store email securely in localStorage (no URL exposure)
           localStorage.setItem('baserise_verified_email', email)
         }
-        // Redirect to ref-code page without email in URL
-        router.push('/ref-code')
+        // Show success state
+        setIsVerified(true)
       }
     }
 
@@ -116,7 +117,8 @@ function CheckEmailContent() {
           localStorage.removeItem(`baserise_timer_${email}`)
           // Store email securely in localStorage (no URL exposure)
           localStorage.setItem('baserise_verified_email', email)
-          router.push('/ref-code')
+          // Show success state
+          setIsVerified(true)
         }
       } catch (error) {
         console.error("Verification check failed", error)
@@ -131,16 +133,16 @@ function CheckEmailContent() {
     <div className="relative min-h-screen flex items-center justify-center bg-[#030303] text-white overflow-hidden font-sans px-4">
       {/* Animated Background */}
       <div className="absolute inset-0 overflow-hidden">
-        <div className="absolute top-[-20%] left-[-10%] w-[50%] h-[50%] bg-blue-600/15 blur-[150px] rounded-full animate-pulse" />
-        <div className="absolute bottom-[-20%] right-[-10%] w-[50%] h-[50%] bg-purple-600/15 blur-[150px] rounded-full animate-pulse" style={{ animationDelay: '1s' }} />
-        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[40%] h-[40%] bg-indigo-600/10 blur-[120px] rounded-full animate-pulse" style={{ animationDelay: '2s' }} />
+        <div className={`absolute top-[-20%] left-[-10%] w-[50%] h-[50%] ${isVerified ? 'bg-green-600/15' : 'bg-blue-600/15'} blur-[150px] rounded-full animate-pulse`} />
+        <div className={`absolute bottom-[-20%] right-[-10%] w-[50%] h-[50%] ${isVerified ? 'bg-emerald-600/15' : 'bg-purple-600/15'} blur-[150px] rounded-full animate-pulse`} style={{ animationDelay: '1s' }} />
+        <div className={`absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[40%] h-[40%] ${isVerified ? 'bg-green-600/10' : 'bg-indigo-600/10'} blur-[120px] rounded-full animate-pulse`} style={{ animationDelay: '2s' }} />
       </div>
 
       {/* Floating Particles */}
       {[...Array(6)].map((_, i) => (
         <motion.div
           key={i}
-          className="absolute w-1 h-1 bg-blue-400/40 rounded-full"
+          className={`absolute w-1 h-1 ${isVerified ? 'bg-green-400/40' : 'bg-blue-400/40'} rounded-full`}
           initial={{ opacity: 0 }}
           animate={{
             opacity: [0, 1, 0],
@@ -159,12 +161,139 @@ function CheckEmailContent() {
         />
       ))}
 
-      <motion.div
-        initial={{ opacity: 0, y: 30, scale: 0.95 }}
-        animate={{ opacity: 1, y: 0, scale: 1 }}
-        transition={{ duration: 0.6, ease: "easeOut" }}
-        className="relative z-10 max-w-md w-full p-8 md:p-10 text-center backdrop-blur-2xl bg-white/[0.03] border border-white/10 rounded-[2.5rem] shadow-2xl"
-      >
+      <AnimatePresence mode="wait">
+        {/* SUCCESS STATE - Mail Verified */}
+        {isVerified ? (
+          <motion.div
+            key="verified"
+            initial={{ scale: 0.8, opacity: 0, y: 30 }}
+            animate={{ scale: 1, opacity: 1, y: 0 }}
+            transition={{ type: 'spring', stiffness: 200, damping: 20 }}
+            className="relative z-10 max-w-md w-full p-1 bg-gradient-to-b from-green-500/30 to-emerald-500/10 rounded-[2.5rem] shadow-[0_0_80px_-20px_rgba(34,197,94,0.4)]"
+          >
+            <div className="bg-[#0A0A0A]/95 rounded-[2.3rem] p-10 text-center backdrop-blur-xl">
+              {/* Confetti Effect */}
+              {[...Array(12)].map((_, i) => (
+                <motion.div
+                  key={i}
+                  className="absolute w-2 h-2 rounded-full"
+                  style={{
+                    background: ['#22c55e', '#10b981', '#34d399', '#6ee7b7', '#fbbf24', '#a78bfa'][i % 6],
+                    left: `${10 + Math.random() * 80}%`,
+                    top: `${10 + Math.random() * 30}%`,
+                  }}
+                  initial={{ opacity: 0, scale: 0, y: 0 }}
+                  animate={{
+                    opacity: [0, 1, 0],
+                    scale: [0, 1, 0.5],
+                    y: [0, -50 - Math.random() * 50],
+                    x: [0, (Math.random() - 0.5) * 100],
+                  }}
+                  transition={{
+                    duration: 2,
+                    delay: i * 0.1,
+                    repeat: Infinity,
+                    repeatDelay: 3,
+                  }}
+                />
+              ))}
+
+              {/* Animated Check Icon */}
+              <motion.div
+                initial={{ scale: 0, rotate: -180 }}
+                animate={{ scale: 1, rotate: 0 }}
+                transition={{ delay: 0.2, type: 'spring', stiffness: 200 }}
+                className="relative w-28 h-28 mx-auto mb-8"
+              >
+                <div className="absolute inset-0 bg-green-500/20 rounded-full blur-xl animate-pulse" />
+                <div className="relative w-full h-full bg-gradient-to-br from-green-500/20 to-emerald-500/10 rounded-full flex items-center justify-center border-2 border-green-500/30 shadow-[0_0_50px_-10px_rgba(34,197,94,0.5)]">
+                  <motion.div
+                    initial={{ scale: 0 }}
+                    animate={{ scale: 1 }}
+                    transition={{ delay: 0.5, type: 'spring' }}
+                  >
+                    <CheckCircle2 size={56} className="text-green-400" />
+                  </motion.div>
+                </div>
+                {/* Sparkles around check */}
+                <motion.div
+                  animate={{ rotate: 360 }}
+                  transition={{ duration: 8, repeat: Infinity, ease: "linear" }}
+                  className="absolute -top-1 -right-1"
+                >
+                  <Sparkles className="text-yellow-400" size={24} />
+                </motion.div>
+                <motion.div
+                  animate={{ rotate: -360 }}
+                  transition={{ duration: 10, repeat: Infinity, ease: "linear" }}
+                  className="absolute -bottom-1 -left-1"
+                >
+                  <Sparkles className="text-green-400" size={18} />
+                </motion.div>
+              </motion.div>
+
+              {/* Success Text */}
+              <motion.h1
+                initial={{ opacity: 0, y: 10 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 0.4 }}
+                className="text-3xl md:text-4xl font-black uppercase italic tracking-tight text-white mb-4"
+              >
+                Mail <span className="text-transparent bg-clip-text bg-gradient-to-r from-green-400 to-emerald-400">Verified!</span>
+              </motion.h1>
+
+              <motion.p
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                transition={{ delay: 0.6 }}
+                className="text-gray-400 text-sm mb-8 leading-relaxed max-w-xs mx-auto"
+              >
+                Your email has been successfully verified. You're now on the BaseRise waitlist!
+              </motion.p>
+
+              {/* Action Buttons */}
+              <motion.div
+                initial={{ opacity: 0, y: 10 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 0.8 }}
+                className="space-y-4"
+              >
+                <Link href="/">
+                  <motion.span
+                    whileHover={{ scale: 1.02 }}
+                    whileTap={{ scale: 0.98 }}
+                    className="inline-flex items-center justify-center gap-2 w-full py-4 bg-gradient-to-r from-green-600 to-emerald-600 hover:from-green-500 hover:to-emerald-500 rounded-xl text-sm font-bold uppercase tracking-widest text-white transition-all duration-300 cursor-pointer shadow-[0_0_25px_-5px_rgba(34,197,94,0.5)] hover:shadow-[0_0_40px_-5px_rgba(34,197,94,0.7)]"
+                  >
+                    <Home size={16} />
+                    Back to Home
+                  </motion.span>
+                </Link>
+              </motion.div>
+
+              {/* Decorative Elements */}
+              <motion.div
+                initial={{ opacity: 0, scale: 0.8 }}
+                animate={{ opacity: 1, scale: 1 }}
+                transition={{ delay: 1 }}
+                className="flex items-center justify-center gap-3 text-xs text-gray-500 uppercase tracking-widest mt-8"
+              >
+                <div className="w-8 h-px bg-gradient-to-r from-transparent to-green-500/50" />
+                <Shield size={12} className="text-green-500/70" />
+                <span>Secured</span>
+                <div className="w-8 h-px bg-gradient-to-l from-transparent to-green-500/50" />
+              </motion.div>
+            </div>
+          </motion.div>
+        ) : (
+          /* WAITING STATE - Original UI */
+          <motion.div
+            key="waiting"
+            initial={{ opacity: 0, y: 30, scale: 0.95 }}
+            animate={{ opacity: 1, y: 0, scale: 1 }}
+            exit={{ opacity: 0, y: -20, scale: 0.95 }}
+            transition={{ duration: 0.6, ease: "easeOut" }}
+            className="relative z-10 max-w-md w-full p-8 md:p-10 text-center backdrop-blur-2xl bg-white/[0.03] border border-white/10 rounded-[2.5rem] shadow-2xl"
+          >
         {/* Icon with Animation */}
         <motion.div
           initial={{ scale: 0 }}
@@ -299,6 +428,8 @@ function CheckEmailContent() {
           </p>
         </motion.div>
       </motion.div>
+        )}
+      </AnimatePresence>
     </div>
   )
 }

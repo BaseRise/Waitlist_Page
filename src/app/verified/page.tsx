@@ -28,7 +28,11 @@ export default function VerifiedSuccess() {
             access_token: accessToken,
             refresh_token: refreshToken
           })
-          if (!error) sessionUser = data.user
+          if (!error) {
+            sessionUser = data.user
+            // Clear hash from URL for security (tokens should not remain visible)
+            window.history.replaceState(null, '', window.location.pathname)
+          }
         } else {
           const { data: { session } } = await supabase.auth.getSession()
           sessionUser = session?.user
@@ -86,6 +90,11 @@ export default function VerifiedSuccess() {
         // Store email in localStorage for ref-code page (secure, no URL exposure)
         localStorage.setItem('baserise_verified_email', userEmail)
         setStatus('success')
+        
+        // Auto redirect to ref-code page after showing success briefly
+        setTimeout(() => {
+          router.push('/ref-code')
+        }, 2500)
       } else {
         setStatus('error')
       }
@@ -195,8 +204,19 @@ export default function VerifiedSuccess() {
                 transition={{ delay: 0.6 }}
                 className="text-gray-400 text-sm mb-8 leading-relaxed max-w-xs mx-auto"
               >
-                Your position on the waitlist is now confirmed. You can safely close this tab now.
+                Your position on the waitlist is now confirmed. Redirecting to your dashboard...
               </motion.p>
+
+              {/* Loading indicator for redirect */}
+              <motion.div
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                transition={{ delay: 1 }}
+                className="flex items-center justify-center gap-2 mb-6"
+              >
+                <Loader2 size={16} className="animate-spin text-green-400" />
+                <span className="text-xs text-green-400/80 uppercase tracking-widest font-bold">Loading Dashboard</span>
+              </motion.div>
 
               {/* Decorative Elements */}
               <motion.div
