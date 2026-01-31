@@ -3,6 +3,7 @@ import { useState, Suspense } from 'react'
 import { useSearchParams } from 'next/navigation'
 import { motion } from 'framer-motion'
 import { Send } from 'lucide-react'
+import Link from 'next/link'
 
 function EarlyAccessContent() {
   const searchParams = useSearchParams()
@@ -56,7 +57,13 @@ function EarlyAccessContent() {
   }
 
   return (
-    <main className="relative z-10 max-w-4xl w-full text-center flex flex-col items-center">
+    <main className="relative z-10 max-w-4xl w-full text-center flex flex-col items-center px-4">
+      {/* Back to Home Link */}
+      <Link href="/" className="self-start mb-8 md:mb-6 text-gray-500 hover:text-white transition-colors text-xs md:text-sm flex items-center gap-1 group">
+        <span className="group-hover:-translate-x-1 transition-transform">←</span>
+        <span>Back to Home</span>
+      </Link>
+
       <div className="flex justify-center mb-6 relative">
         <div className="float-animation w-24 h-24 rounded-full bg-blue-600 blur-[50px] opacity-30 absolute top-[-10px]"></div>
         <div className="relative w-16 h-16 bg-gradient-to-br from-blue-600 to-indigo-800 rounded-2xl rotate-12 flex items-center justify-center shadow-2xl border border-white/20 z-20">
